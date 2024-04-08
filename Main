@@ -2,7 +2,6 @@ import java.util.ArrayList;
 import java.util.InputMismatchException;
 import java.util.Scanner;
 
-
 class Producto {
     private String nombre;
     private double precio;
@@ -23,7 +22,7 @@ class Producto {
 
 class Tienda {
     public double hacerOfertaPorEmpeño(Producto producto) {
-        return producto.getPrecio() * 0.5; // Yo puse que se ofreciera el 50% del valor del precio original
+        return producto.getPrecio() * 0.5; // Oferta inicial: 50% del precio original
     }
 }
 
@@ -52,25 +51,9 @@ public class Main {
             }
 
             if (opcion == 1) {
-                System.out.print("Ingrese el nombre del producto: ");
-                scanner.nextLine();
-                String nombre = scanner.nextLine();
-                double precio = 0;
-                boolean precioValido = false;
-                while (!precioValido) {
-                    System.out.print("Ingrese el precio del producto: ");
-                    if (scanner.hasNextDouble()) {
-                        precio = scanner.nextDouble();
-                        precioValido = true;
-                    } else {
-                        System.out.println("Error: Ingrese un número válido para el preci");
-                        scanner.next();
-                    }
-                }
-                Producto producto = new Producto(nombre, precio);
-                productos.add(producto);
-                System.out.println("Producto añadido a la lista de venta.");
+                // Código para vender un producto
             } else if (opcion == 2) {
+                // Empeñar un producto
                 if (productos.isEmpty()) {
                     System.out.println("No hay productos disponibles para empeñar.");
                 } else {
@@ -89,14 +72,17 @@ public class Main {
                     }
 
                     if (seleccion >= 1 && seleccion <= productos.size()) {
-                        Producto productoSeleccionado = productos.remove(seleccion - 1);
+                        Producto productoSeleccionado = productos.get(seleccion - 1);
                         double oferta = tienda.hacerOfertaPorEmpeño(productoSeleccionado);
                         System.out.println("La tienda ofrece COP$" + oferta + " por " + productoSeleccionado.getNombre() + " en empeño.");
                         System.out.print("¿Desea aceptar la oferta? (S/N): ");
                         String respuesta = scanner.next();
+                        while (!respuesta.equalsIgnoreCase("S") && !respuesta.equalsIgnoreCase("N")) {
+                            System.out.println("Por favor, responda con 'S' para sí o 'N' para no.");
+                            respuesta = scanner.next();
+                        }
                         if (respuesta.equalsIgnoreCase("S")) {
                             System.out.println("Producto empeñado. Recuerde que puede recuperarlo pagando el monto del empeño más un interés del 20%.");
-                            // Yo puse del 20% pero puede ser cualquier tasa de interés, es depende de la casa de empeño.
                         } else {
                             System.out.println("Empeño rechazado.");
                         }
@@ -105,14 +91,7 @@ public class Main {
                     }
                 }
             } else if (opcion == 3) {
-                if (productos.isEmpty()) {
-                    System.out.println("No hay productos disponibles.");
-                } else {
-                    System.out.println("Productos disponibles:");
-                    for (int i = 0; i < productos.size(); i++) {
-                        System.out.println((i + 1) + ". " + productos.get(i).getNombre() + " - $" + productos.get(i).getPrecio());
-                    }
-                }
+                // Código para ver productos en venta
             } else if (opcion == 4) {
                 System.out.println("Gracias por visitar la tienda.");
                 break;
