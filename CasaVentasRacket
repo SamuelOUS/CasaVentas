@@ -1,0 +1,128 @@
+#lang racket
+
+(define productos '()) ; Lista para almacenar los productos y sus precios
+(define reservas '())  ; Lista para almacenar los productos reservados
+
+(define (agregar-producto)
+  (newline)
+  (display "Ingrese el nombre del producto: ")
+  (define nombre (read-line))
+  (cond
+    [(string->number nombre) => (lambda (_) (displayln "El nombre no puede ser un número. Inténtelo de nuevo.") (agregar-producto))]
+    [else
+     (display "Ingrese el precio del producto: ")
+     (define precio-str (read-line))
+     (cond
+       [(string-numeric? precio-str)
+        (define precio (string->number precio-str))
+        (set! productos (cons (list nombre precio) productos))
+        (newline)
+        (display "Producto agregado correctamente")]
+       [else
+        (displayln "El precio debe ser un número. Inténtelo de nuevo.")
+        (agregar-producto)])]))
+
+(define (cancelar-o-modificar)
+  (newline)
+  (displayln "¿Qué desea hacer?")
+  (displayln "1. Cancelar un producto")
+  (displayln "2. Modificar un producto")
+  (newline)
+  (display "Seleccione una opción (1-2): ")
+  (define accion (read))
+  (cond
+    [(= accion 1) (cancelar-producto)]
+    [(= accion 2) (modificar-producto)]
+    [else (displayln "Opción no válida. Por favor, seleccione una opción válida.") (cancelar-o-modificar)]))
+
+(define (cancelar-producto)
+  (newline)
+  (displayln "Productos agregados:")
+  (for-each (lambda (producto)
+              (displayln (string-append (car producto) " - $" (number->string (cadr producto)))))
+            productos)
+  (display "Ingrese el nombre del producto a cancelar: ")
+  (define nombre (read-line))
+  (set! productos (filter (lambda (producto) (not (equal? (car producto) nombre))) productos))
+  (displayln "Producto cancelado correctamente"))
+
+(define (modificar-producto)
+  (newline)
+  (displayln "Productos agregados:")
+  (for-each (lambda (producto)
+              (displayln (string-append (car producto) " - $" (number->string (cadr producto)))))
+            productos)
+  (display "Ingrese el nombre del producto a modificar: ")
+  (define nombre (read-line))
+  (display "Ingrese el nuevo nombre del producto: ")
+  (define nuevo-nombre (read-line))
+  (display "Ingrese el nuevo precio del producto: ")
+  (define nuevo-precio (read))
+  (set! productos (map (lambda (producto)
+                         (if (equal? (car producto) nombre)
+                             (list nuevo-nombre nuevo-precio)
+                             producto))
+                       productos))
+  (displayln "Producto modificado correctamente"))
+
+(define (consultar-productos)
+  (newline)
+  (displayln "Productos disponibles:")
+  (for-each (lambda (producto)
+              (displayln (string-append (car producto) " - $" (number->string (cadr producto)))))
+            productos))
+
+(define (reservar-producto)
+  (newline)
+  (displayln "Productos disponibles para reservar:")
+  (for-each (lambda (producto)
+              (displayln (string-append (car producto) " - $" (number->string (cadr producto)))))
+            productos)
+  (display "Ingrese el nombre del producto a reservar: ")
+  (define nombre (read-line))
+  (set! reservas (cons nombre reservas))
+  (displayln "Producto reservado correctamente"))
+
+(define (quitar-reserva)
+  (newline)
+  (displayln "Productos reservados:")
+  (for-each displayln reservas)
+  (display "Ingrese el nombre del producto a quitar de las reservas: ")
+  (define nombre (read-line))
+  (set! reservas (filter (lambda (producto) (not (equal? producto nombre))) reservas))
+  (displayln "Reserva eliminada correctamente"))
+
+(define (calcular-total)
+  (newline)
+  (define total 0)
+  (for-each (lambda (producto)
+              (define nombre (car producto))
+              (define precio (cadr producto))
+              (if (member nombre reservas)
+                  (set! total (+ total precio))
+                  #f)) ; Corrección: añadir una rama else
+            productos)
+  (displayln (string-append "Total a pagar: $" (number->string total))))
+
+(define (menu)
+  (displayln "Bienvenido al sistema de gestión de productos y reservas")
+  (newline)
+  (displayln "1. Agregar productos y ponerles precio")
+  (displayln "2. Cancelar/Modificar productos agregados")
+  (displayln "3. Consultar productos disponibles")
+  (displayln "4. Reservar productos disponibles")
+  (displayln "5. Quitar productos reservados")
+  (displayln "6. Mostrar total a pagar")
+  (newline)
+  (display "Seleccione una opción (1-6): ")
+  (define opcion (read))
+  (cond
+    [(= opcion 1) (agregar-producto) (menu)]
+    [(= opcion 2) (cancelar-o-modificar) (menu)]
+    [(= opcion 3) (consultar-productos) (menu)]
+    [(= opcion 4) (reservar-producto) (menu)]
+    [(= opcion 5) (quitar-reserva) (menu)]
+    [(= opcion 6) (calcular-total) (menu)]
+    [else (displayln "Opción no válida. Por favor, seleccione una opción válida.") (menu)]))
+
+(menu)
