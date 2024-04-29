@@ -3,6 +3,9 @@
 (define productos '()) ; Lista para almacenar los productos y sus precios
 (define reservas '())  ; Lista para almacenar los productos reservados
 
+(define (string-numeric? str)
+  (andmap char-numeric? (string->list str)))
+
 (define (agregar-producto)
   (newline)
   (display "Ingrese el nombre del producto: ")
